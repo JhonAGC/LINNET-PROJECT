@@ -35,3 +35,60 @@ Este proyecto se centra en la optimización de una base de datos Oracle utilizan
 
 El proyecto está estructurado de la siguiente manera:
 
+
+- **sql_scripts/procedimientos.sql:** Contiene los procedimientos almacenados implementados en el proyecto.
+- **sql_scripts/triggers.sql:** Contiene los triggers implementados en el proyecto.
+- **sql_scripts/paquetes.sql:** Contiene los paquetes implementados en el proyecto.
+
+## Procedimientos Almacenados
+
+### Procedimiento 1: `datos_cliente`
+
+Este procedimiento devuelve los datos de un cliente.
+
+```sql
+CREATE OR REPLACE PROCEDURE datos_cliente(codigo in varchar2)
+AS
+    v_codigo varchar2(10):=codigo;
+    v_cod_cliente       tb_cliente.cod_cliente%TYPE;
+    v_nombre             tb_cliente.nombre_cli%TYPE;
+    v_apellido_p         tb_cliente.ap_pat_cli%TYPE;
+    v_apellido_m        tb_cliente.ap_mat_cli%TYPE;
+    v_cod_direccion  tb_cliente.cod_direccion%TYPE;
+    
+    v_distrito           tb_direccion.distrito%TYPE;
+    v_tipo_via          tb_direccion.tipo_via%TYPE;
+    v_nom_via        tb_direccion.nom_via%TYPE;
+    v_num_via        tb_direccion.num_via%TYPE;
+    v_referencia    tb_direccion.referencia%TYPE;
+    
+BEGIN
+
+            SELECT cod_cliente INTO v_cod_cliente FROM tb_cliente WHERE cod_cliente=v_codigo; 
+            
+            IF v_codigo = v_cod_cliente THEN
+            
+                SELECT  nombre_cli, ap_pat_cli, ap_mat_cli,cod_direccion INTO v_nombre, v_apellido_p,v_apellido_m,v_cod_direccion FROM
+                tb_cliente WHERE cod_cliente=v_codigo;
+            
+                SELECT   distrito, tipo_via,nom_via,num_via,referencia INTO v_distrito, v_tipo_via,v_nom_via,v_num_via,v_referencia FROM
+                tb_direccion where cod_direccion=v_cod_direccion;
+            
+                DBMS_OUTPUT.PUT_LINE('LOS DATOS DEL CLIENTE  ' || v_cod_cliente || ' SON: ');
+                DBMS_OUTPUT.PUT_LINE( 'nombre: '||v_nombre|| ' ' || v_apellido_p|| ' ' ||v_apellido_m  );
+                DBMS_OUTPUT.PUT_LINE(' ');
+                DBMS_OUTPUT.PUT_LINE( 'DIRECCION : ');
+                DBMS_OUTPUT.PUT_LINE('Distrito: '|| v_distrito);
+                DBMS_OUTPUT.PUT_LINE(  v_tipo_via||'.  ' || v_nom_via|| ' N° '||v_num_via);
+                DBMS_OUTPUT.PUT_LINE('REFERENCIA:   ');
+                DBMS_OUTPUT.PUT_LINE(v_referencia);
+       ELSE
+            DBMS_OUTPUT.PUT_LINE( 'El codigo de cliente no existe 02');
+        END IF;
+EXCEPTION
+
+    WHEN OTHERS THEN
+
+DBMS_OUTPUT.PUT_LINE( 'El codigo de cliente no existe 02');
+           
+END datos_cliente;
